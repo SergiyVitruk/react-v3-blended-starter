@@ -1,5 +1,15 @@
 import style from "./GridItem.module.css";
+import type { ReactNode, MouseEventHandler } from "react";
 
-export default function GridItem({ children }) {
-  return <li className={style.item}>{children}</li>;
+interface GridItemProps {
+  children: ReactNode;
+  onClick?: MouseEventHandler<HTMLLIElement>;
+}
+
+export default function GridItem({ children, onClick }: GridItemProps) {
+  return (
+    <li className={style.item} onClick={onClick}>
+      {children}
+    </li>
+  );
 }
