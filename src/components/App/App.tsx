@@ -1,19 +1,22 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { ChangeEvent, useState } from "react";
 import css from "./App.module.css";
 import PostList from "../PostList/PostList";
 import SearchBox from "../SearchBox/SearchBox";
-import { fetchPosts } from "../../services/postService";
+import { deletePost, fetchPosts } from "../../services/postService";
 import Pagination from "../Pagination/Pagination";
 import { useDebouncedCallback } from "use-debounce";
 import { Post } from "../../types/post";
 import PostForm from "../CreatePostForm/CreatePostForm";
 import Modal from "../Modal/Modal";
 import EditPostForm from "../EditPostForm/EditPostForm";
+import { useQueryClient } from "@tanstack/react-query";
 
 const LIMIT = 12;
 
 export default function App() {
+  const queryClient = useQueryClient();
+
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreatePost, setIsCreatePost] = useState(false);
@@ -43,9 +46,26 @@ export default function App() {
     setIsCreatePost(false);
   };
 
+  const handleCreatePost = () => {
+    setIsCreatePost(true);
+    setIsModalOpen(true);
+  };
+
   const handleChange = useDebouncedCallback((event: ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
   }, 500);
+
+  const deleteMutation = useMutation({
+    mutationFn: deletePost,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+  });
+
+  const handleDelete = (id: number) => {
+    console.log("Post deleted:", id);
+    deleteMutation.mutate(id);
+  };
 
   const totalPages = data?.totalCount ? Math.ceil(data.totalCount / LIMIT) : 0;
 
@@ -53,17 +73,21 @@ export default function App() {
     <div className={css.app}>
       <header className={css.toolbar}>
         <SearchBox onChange={handleChange} />
-        <button className={css.button}>Create post</button>
+        <button className={css.button} onClick={handleCreatePost}>
+          Create post
+        </button>
       </header>
       {isModalOpen && (
-        <Modal>
+        <Modal onClose={handleCloseModal}>
           {isEditPost && editedPost && (
             <EditPostForm initialValues={editedPost} onClose={handleCloseModal} />
           )}
-          {isCreatePost && <PostForm initialValues={null} onClose={handleCloseModal} />}
+          {isCreatePost && <PostForm onClose={handleCloseModal} />}
         </Modal>
       )}
-      {data && data?.posts.length > 0 && <PostList posts={data.posts} handleEdit={handleEdit} />}
+      {data && data?.posts.length > 0 && (
+        <PostList posts={data.posts} handleEdit={handleEdit} handleDelete={handleDelete} />
+      )}
       {totalPages > 1 && (
         <Pagination
           totalPages={totalPages}

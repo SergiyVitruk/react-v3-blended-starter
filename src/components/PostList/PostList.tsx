@@ -4,9 +4,10 @@ import css from "./PostList.module.css";
 interface PostListProps {
   posts: Post[];
   handleEdit: (post: Post) => void;
+  handleDelete: (id: number) => void;
 }
 
-export default function PostList({ posts, handleEdit }: PostListProps) {
+export default function PostList({ posts, handleEdit, handleDelete }: PostListProps) {
   return (
     <ul className={css.list}>
       {posts.map((post) => (
@@ -17,7 +18,9 @@ export default function PostList({ posts, handleEdit }: PostListProps) {
             <button onClick={() => handleEdit(post)} className={css.edit}>
               Edit
             </button>
-            <button className={css.delete}>Delete</button>
+            <button onClick={() => handleDelete(post.id)} className={css.delete}>
+              Delete
+            </button>
           </div>
         </li>
       ))}

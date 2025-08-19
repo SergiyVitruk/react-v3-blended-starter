@@ -1,11 +1,48 @@
 import * as Yup from "yup";
 import { Field, Form, Formik, FormikHelpers, ErrorMessage } from "formik";
-
 import css from "./CreatePostForm.module.css";
+import { useMutation } from "@tanstack/react-query";
+import { createPost } from "../../services/postService";
+import { useQueryClient } from "@tanstack/react-query";
 
-export default function PostForm() {
+interface PostFormValues {
+  title: string;
+  body: string;
+}
+
+interface PostFormProps {
+  onClose: () => void;
+}
+
+const validationSchema = Yup.object({
+  title: Yup.string().required("Title is required").min(3, "Too short"),
+  body: Yup.string().required("Content is required").min(5, "Too short"),
+});
+
+export default function PostForm({ onClose }: PostFormProps) {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: createPost,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      onClose();
+    },
+  });
+
+  const handleSubmit = (values: PostFormValues, { resetForm }: FormikHelpers<PostFormValues>) => {
+    console.log("New post created:", values);
+    mutation.mutate(values);
+    resetForm();
+    onClose();
+  };
+
   return (
-    <Formik initialValues={} onSubmit={} validationSchema={}>
+    <Formik
+      initialValues={{ title: "", body: "" }}
+      onSubmit={handleSubmit}
+      validationSchema={validationSchema}
+    >
       <Form className={css.form}>
         <div className={css.formGroup}>
           <label htmlFor="title">Title</label>
@@ -20,11 +57,11 @@ export default function PostForm() {
         </div>
 
         <div className={css.actions}>
-          <button type="button" className={css.cancelButton}>
+          <button type="button" className={css.cancelButton} onClick={onClose}>
             Cancel
           </button>
-          <button type="submit" className={css.submitButton} disabled={}>
-            Create post
+          <button type="submit" className={css.submitButton} disabled={mutation.isPending}>
+            {mutation.isPending ? "Creating..." : "Create post"}
           </button>
         </div>
       </Form>

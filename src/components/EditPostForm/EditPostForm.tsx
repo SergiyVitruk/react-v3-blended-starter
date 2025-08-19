@@ -12,8 +12,8 @@ interface editPostFormProps {
 }
 
 const PostsSchema = Yup.object().shape({
-  title: Yup.string().required("title required").min(3).max(50),
-  body: Yup.string().required("title required").min(3).max(150),
+  title: Yup.string().required("title required").min(3),
+  body: Yup.string().required("title required").min(3),
 });
 
 export default function EditPostForm({ initialValues, onClose }: editPostFormProps) {
@@ -48,7 +48,7 @@ export default function EditPostForm({ initialValues, onClose }: editPostFormPro
         </div>
 
         <div className={css.actions}>
-          <button type="button" className={css.cancelButton}>
+          <button type="button" className={css.cancelButton} onClick={onClose}>
             Cancel
           </button>
           <button type="submit" className={css.submitButton}>

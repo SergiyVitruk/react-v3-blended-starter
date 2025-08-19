@@ -27,7 +27,10 @@ export const fetchPosts = async (
   };
 };
 
-// export const createPost = async (newPost) => {};
+export const createPost = async (newPost: { title: string; body: string }): Promise<Post> => {
+  const { data } = await axios.post("/posts/add", newPost);
+  return data;
+};
 
 export const editPost = async (newDataPost: Post) => {
   const { data } = await axios.patch<Post>(`/posts/${newDataPost.id}`, newDataPost);
@@ -35,4 +38,6 @@ export const editPost = async (newDataPost: Post) => {
   return data;
 };
 
-// export const deletePost = async (postId) => {};
+export const deletePost = async (postId: number): Promise<void> => {
+  await axios.delete(`/posts/${postId}`);
+};
