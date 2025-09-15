@@ -1,6 +1,15 @@
+import { ReactNode } from 'react';
 import styles from './Heading.module.css';
 
-export default function Heading({ title, top, bottom, error, info }) {
+interface HeadingProp {
+  title: ReactNode;
+  top?: boolean;
+  bottom?: boolean;
+  error?: boolean;
+  info?: boolean;
+}
+
+export default function Heading({ title, top, bottom, error, info }: HeadingProp) {
   let className = styles.title;
 
   if (top) className += ` ${styles.top}`;
