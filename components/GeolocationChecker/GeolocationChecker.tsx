@@ -26,7 +26,7 @@ export default function GeolocationChecker() {
     };
 
     const error = () => {
-      setBaseCurrency('UAH');
+      setBaseCurrency('USD');
     };
 
     navigator.geolocation.getCurrentPosition(success, error, options);

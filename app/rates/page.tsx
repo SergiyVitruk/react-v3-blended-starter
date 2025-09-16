@@ -53,7 +53,7 @@ export default function RatesPage() {
             bottom
             title={
               <Wave
-                text={`$ $ $ Current exchange rate for 1 ${baseCurrency} $ $ $`}
+                text={`$ $ $ Current exchange rate for ${baseCurrency} $ $ $`}
                 effect="fadeOut"
                 effectChange={4.0}
               />
